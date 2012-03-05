@@ -556,9 +556,6 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
 	if (err)
 		goto fail_id;
 
-	if (blk_throtl_init(q))
-		goto fail_bdi;
-
 	setup_timer(&q->backing_dev_info.laptop_mode_wb_timer,
 		    laptop_mode_timer_fn, (unsigned long) q);
 	setup_timer(&q->timeout, blk_rq_timed_out_timer, (unsigned long) q);
@@ -581,10 +578,11 @@ struct request_queue *blk_alloc_queue_node(gfp_t gfp_mask, int node_id)
 	 */
 	q->queue_lock = &q->__queue_lock;
 
+	if (blk_throtl_init(q))
+		goto fail_id;
+
 	return q;
 
-fail_bdi:
-	bdi_destroy(&q->backing_dev_info);
 fail_id:
 	ida_simple_remove(&blk_queue_ida, q->id);
 fail_q:
