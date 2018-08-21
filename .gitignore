@@ -83,3 +83,8 @@ GTAGS
 *.orig
 *~
 \#*#
+
+# Misc stuff
+/out_gcc
+/build_gcc.sh
+/build
